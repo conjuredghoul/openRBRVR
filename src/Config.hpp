@@ -190,7 +190,7 @@ struct Config {
 
     bool write(const std::filesystem::path& path) const
     {
-        constexpr auto round = [](double v) -> double { return std::round(v * 100.0) / 100.0; };
+        constexpr auto round = [](double v) -> double { return std::round(v * 10000.0) / 10000.0; };
 
         std::ofstream f(path);
         if (!f.good()) {
@@ -204,7 +204,7 @@ struct Config {
             { "overlayTranslateY", round(overlay_translation.y) },
             { "overlayTranslateZ", round(overlay_translation.z) },
             { "lockToHorizon", static_cast<int>(lock_to_horizon) },
-            { "horizonLockMultiplier", round(horizon_lock_multiplier) },
+            { "horizonLockMultiplier", horizon_lock_multiplier },
             { "horizonLockFlip", horizon_lock_flip },
             { "desktopWindowMode", companion_mode_str(companion_mode) },
             { "drawLoadingScreen", draw_loading_screen },

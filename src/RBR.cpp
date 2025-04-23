@@ -201,15 +201,20 @@ namespace rbr {
             auto alpha = g::cfg.horizon_lock_multiplier;
 
             static double previous_frame_pitch = 0.0;
+            static double previous_frame_roll = 0.0;
             auto pitch_offset = 0.0;
-
+            auto roll_offset = 0.0;
 
             auto pitch_new = alpha * pitch + (1.0 - alpha) * previous_frame_pitch;
+            auto roll_new = alpha * roll + (1.0 - alpha) * previous_frame_roll;
 
             previous_frame_pitch = pitch_new;
+            previous_frame_roll = roll_new;
+            
             pitch_offset = pitch - pitch_new;
+            roll_offset = roll - roll_new;
 
-            glm::quat cancel_car_rotation = glm::normalize(glm::quat(glm::vec3(pitch_offset, yaw, roll)));
+            glm::quat cancel_car_rotation = glm::normalize(glm::quat(glm::vec3(pitch_offset, yaw, roll_offset)));
             g::horizon_lock_matrix = glm::mat4_cast(cancel_car_rotation);
         } else {
             g::horizon_lock_matrix = glm::identity<M4>();

@@ -27,8 +27,8 @@ namespace g {
     static M3* car_rotation_ptr;
     static int session_recenter_frame_counter;
     static int stage_recenter_frame_counter = INT32_MAX;
-    static double lowpass_alpha;
-
+    static double lowpass_pitch_alpha;
+    static double lowpass_roll_alpha;
     static bool allow_writetext = true;
     static Hook<decltype(IRBRGameVtbl::WriteText)> writetext_hook;
 }
@@ -185,10 +185,16 @@ namespace rbr {
         return g::horizon_lock_matrix;
     }
 
-    double calculate_lowpass_alpha()
+    double calculate_lowpass_roll_alpha()
     {
-        g::lowpass_alpha = 1.0 - exp(-(1.0 / g::target_fps) / g::cfg.horizon_lock_multiplier);
-        return g::lowpass_alpha;
+        g::lowpass_roll_alpha = 1.0 - exp(-(1.0 / g::target_fps) / g::cfg.lowpass_roll_filter);
+        return g::lowpass_roll_alpha;
+    }
+
+    double calculate_lowpass_pitch_alpha()
+    {
+        g::lowpass_pitch_alpha = 1.0 - exp(-(1.0 / g::target_fps) / g::cfg.lowpass_pitch_filter);
+        return g::lowpass_pitch_alpha;
     }
 
     bool should_use_reverse_z_buffer()
@@ -205,15 +211,16 @@ namespace rbr {
             auto pitch = (g::cfg.lock_to_horizon & HorizonLock::LOCK_PITCH) ? glm::pitch(q) : 0.0f;
             auto roll = (g::cfg.lock_to_horizon & HorizonLock::LOCK_ROLL) ? glm::yaw(q) : 0.0f; // somehow in glm the axis is yaw
             auto yaw = 0.0f;
-            auto alpha = calculate_lowpass_alpha();
+            auto pitch_alpha = calculate_lowpass_pitch_alpha();
+            auto roll_alpha = calculate_lowpass_roll_alpha();
 
             static double previous_frame_pitch = 0.0;
             static double previous_frame_roll = 0.0;
             auto pitch_offset = 0.0;
             auto roll_offset = 0.0;
 
-            auto pitch_new = alpha * pitch + (1.0 - alpha) * previous_frame_pitch;
-            auto roll_new = alpha * roll + (1.0 - alpha) * previous_frame_roll;
+            auto pitch_new = pitch_alpha * pitch + (1.0 - pitch_alpha) * previous_frame_pitch;
+            auto roll_new = roll_alpha * roll + (1.0 - roll_alpha) * previous_frame_roll;
 
             previous_frame_pitch = pitch_new;
             previous_frame_roll = roll_new;

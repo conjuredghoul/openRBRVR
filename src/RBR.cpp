@@ -27,6 +27,7 @@ namespace g {
     static M3* car_rotation_ptr;
     static int session_recenter_frame_counter;
     static int stage_recenter_frame_counter = INT32_MAX;
+    static double lowpass_alpha;
 
     static bool allow_writetext = true;
     static Hook<decltype(IRBRGameVtbl::WriteText)> writetext_hook;
@@ -184,6 +185,12 @@ namespace rbr {
         return g::horizon_lock_matrix;
     }
 
+    double calculate_lowpass_alpha()
+    {
+        g::lowpass_alpha = 1.0 - exp(-(1.0 / g::target_fps) / g::cfg.horizon_lock_multiplier);
+        return g::lowpass_alpha;
+    }
+
     bool should_use_reverse_z_buffer()
     {
         return g::is_rendering_3d && g::game_mode != GameMode::MainMenu;
@@ -198,7 +205,7 @@ namespace rbr {
             auto pitch = (g::cfg.lock_to_horizon & HorizonLock::LOCK_PITCH) ? glm::pitch(q) : 0.0f;
             auto roll = (g::cfg.lock_to_horizon & HorizonLock::LOCK_ROLL) ? glm::yaw(q) : 0.0f; // somehow in glm the axis is yaw
             auto yaw = 0.0f;
-            auto alpha = g::cfg.horizon_lock_multiplier;
+            auto alpha = calculate_lowpass_alpha();
 
             static double previous_frame_pitch = 0.0;
             static double previous_frame_roll = 0.0;

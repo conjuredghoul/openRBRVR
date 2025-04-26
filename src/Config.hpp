@@ -190,7 +190,7 @@ struct Config {
 
     bool write(const std::filesystem::path& path) const
     {
-        constexpr auto round = [](double v) -> double { return std::round(v * 10000.0) / 10000.0; };
+        constexpr auto round = [](double v) -> double { return std::round(v * 1000.0) / 1000.0; };
 
         std::ofstream f(path);
         if (!f.good()) {

@@ -244,12 +244,12 @@ static class Menu horizon_lock_menu = { "openRBRVR horizon lock settings", {
     .right_action = [] { change_horizon_lock(true); },
     .select_action = [] { change_horizon_lock(true); },
   },
-  { .text = [] { return std::format("Alpha: {:.4f}", g::cfg.horizon_lock_multiplier); },
+  { .text = [] { return std::format("Time Dampen: {:.3f}", g::cfg.horizon_lock_multiplier); },
     .long_text = {
-        "Alpha value for low-pass filter.",
+        "Insert time value (in seconds) to be smoothed by low-pass filter.",
     },
-    .left_action = [] { g::cfg.horizon_lock_multiplier = std::max<double>(0.0, (g::cfg.horizon_lock_multiplier - 0.001)); },
-    .right_action = [] { g::cfg.horizon_lock_multiplier = std::min<double>(1.0, (g::cfg.horizon_lock_multiplier + 0.001)); },
+    .left_action = [] { g::cfg.horizon_lock_multiplier = std::max<double>(0.0, (g::cfg.horizon_lock_multiplier - 0.05)); },
+    .right_action = [] { g::cfg.horizon_lock_multiplier = std::min<double>(10.0, (g::cfg.horizon_lock_multiplier + 0.05)); },
   },
   { .text = [] { return std::format("Flip camera when the car tilts: {}", g::cfg.horizon_lock_flip ? "ON" : "OFF"); },
     .long_text = {

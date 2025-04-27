@@ -50,6 +50,14 @@ static std::string get_horizon_lock_str()
             return "Pitch";
         case (HorizonLock::LOCK_ROLL | HorizonLock::LOCK_PITCH):
             return "Pitch and roll";
+        case HorizonLock::LOWPASS_NONE:
+            return "Off";
+        case HorizonLock::LOWPASS_PITCH:
+            return "Off";
+        case HorizonLock::LOWPASS_ROLL:
+            return "Off";
+        case (HorizonLock::LOWPASS_ROLL | HorizonLock::LOWPASS_PITCH):
+            return "Off";
         default:
             return "Unknown";
     }
@@ -76,6 +84,54 @@ static void change_horizon_lock(bool forward)
     }
 }
 
+<<<<<<< Updated upstream
+=======
+static std::string get_lowpass_str()
+{
+    switch (g::cfg.lock_to_horizon) {
+        case HorizonLock::LOWPASS_NONE:
+            return "Off";
+        case HorizonLock::LOWPASS_ROLL:
+            return "Roll";
+        case HorizonLock::LOWPASS_PITCH:
+            return "Pitch";
+        case (HorizonLock::LOWPASS_ROLL | HorizonLock::LOWPASS_PITCH):
+            return "Pitch and roll";
+        case HorizonLock::LOCK_NONE:
+            return "Off";
+        case HorizonLock::LOCK_PITCH:
+            return "Off";
+        case HorizonLock::LOCK_ROLL:
+            return "Off";
+        case (HorizonLock::LOCK_ROLL | HorizonLock::LOCK_PITCH):
+            return "Off";
+        default:
+            return "Unknown";
+    }
+}
+
+static void change_lowpass(bool forward)
+{
+    switch (g::cfg.lock_to_horizon) {
+        case HorizonLock::LOWPASS_NONE:
+            g::cfg.lock_to_horizon = forward ? HorizonLock::LOWPASS_ROLL : static_cast<HorizonLock>((HorizonLock::LOWPASS_ROLL | HorizonLock::LOWPASS_PITCH));
+            break;
+        case HorizonLock::LOWPASS_ROLL:
+            g::cfg.lock_to_horizon = forward ? HorizonLock::LOWPASS_PITCH : HorizonLock::LOWPASS_NONE;
+            break;
+        case HorizonLock::LOWPASS_PITCH:
+            g::cfg.lock_to_horizon = forward ? static_cast<HorizonLock>((HorizonLock::LOWPASS_ROLL | HorizonLock::LOWPASS_PITCH)) : HorizonLock::LOWPASS_ROLL;
+            break;
+        case (HorizonLock::LOWPASS_ROLL | HorizonLock::LOWPASS_PITCH):
+            g::cfg.lock_to_horizon = forward ? HorizonLock::LOWPASS_NONE : HorizonLock::LOWPASS_PITCH;
+            break;
+        default:
+            g::cfg.lock_to_horizon = HorizonLock::LOWPASS_NONE;
+            break;
+    }
+}
+
+>>>>>>> Stashed changes
 static void ChangeCompanionMode(bool forward)
 {
     if (forward) {
@@ -120,7 +176,7 @@ static class Menu main_menu = { "openRBRVR", {
     .left_action = [] { Toggle(g::cfg.recenter_at_stage_start); },
     .right_action = [] { Toggle(g::cfg.recenter_at_stage_start); },
   },
-  { .text = id("Horizon lock settings") , .long_text = {"Horizon lock settings"}, .select_action = [] { select_menu(4); } },
+  { .text = id("Horizon lock and low-pass filter settings") , .long_text = {"Horizon lock and low-pass filter settings"}, .select_action = [] { select_menu(4); } },
   { .text = id("Rendering settings") , .long_text = {"Selection of different rendering settings"}, .select_action = [] { select_menu(1); } },
   { .text = id("Menu & overlay settings") , .long_text = {"Adjust the size and position of the 2D content shown on", "top of the 3D view while driving.", "Also contains main menu settings."}, .select_action = [] { select_menu(5); } },
   { .text = id("Desktop window settings") ,
